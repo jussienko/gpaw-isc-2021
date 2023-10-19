@@ -13,7 +13,7 @@ from gpaw.test import equal
 # no. of replicates in each dimension (increase to scale up the system)
 x = 2
 y = 2
-z = 4
+z = 3
 # setup the system
 atoms = FaceCenteredCubic(directions=[[1,-1,0], [1,1,-2], [1,1,1]],
         size=(x,y,z), symbol='Cu', pbc=(0,0,1))
@@ -38,7 +38,8 @@ if rank == 0:
     print("")
 
 # setup parameters
-args = {'h': h,
+args = {'mode' : 'fd',
+        'h': h,
         'nbands': -20,
         'occupations': FermiDirac(0.2),
         'kpts': kpts,
@@ -62,5 +63,5 @@ if rank == 0:
     print("Free energy: " + str(e0))
 
 # Check the result
-equal(e0, -302.7928234744071, 1e-4)
+equal(e0, -226.93897028587003, 1e-4)
 

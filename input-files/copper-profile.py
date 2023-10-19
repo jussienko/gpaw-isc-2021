@@ -17,13 +17,16 @@ from gpaw.test import equal
 profile = True
 if profile:
     from cProfile import Profile
-    from gpaw.mpi import rank
+    from gpaw.mpi import rank, broadcast
     import os
     from datetime import datetime
 
-    profile_dir = 'profile-' + datetime.now().isoformat(timespec='seconds')
     if rank == 0:
+        profile_dir = 'profile-' + datetime.now().isoformat(timespec='seconds')
         os.mkdir(profile_dir)
+    else:
+        profile_dir = None
+    profile_dir = broadcast(profile_dir, root=0)
     profile_name = os.path.join(profile_dir, 'prof.{:04d}'.format(rank))
     prof = Profile()
     prof.enable()
@@ -32,7 +35,7 @@ if profile:
 # no. of replicates in each dimension (increase to scale up the system)
 x = 2
 y = 2
-z = 4
+z = 3
 # setup the system
 atoms = FaceCenteredCubic(directions=[[1,-1,0], [1,1,-2], [1,1,1]],
         size=(x,y,z), symbol='Cu', pbc=(0,0,1))
@@ -42,7 +45,7 @@ atoms.center(vacuum=6.0, axis=1)
 # Simulation parameters
 h = 0.22
 kpts = (1,1,8)
-txt = 'output_M_%i.txt' % size
+txt = 'output_M_profile_%i.txt' % size
 maxiter = 15
 
 # output benchmark parameters
@@ -57,7 +60,8 @@ if rank == 0:
     print("")
 
 # setup parameters
-args = {'h': h,
+args = {'mode' : 'fd',
+        'h': h,
         'nbands': -20,
         'occupations': FermiDirac(0.2),
         'kpts': kpts,
@@ -85,5 +89,5 @@ if profile:
     prof.dump_stats(profile_name)
 
 # Check the result
-equal(e0, -302.7928234744071, 1e-4)
+equal(e0, -226.93897028587003, 1e-4)
 

@@ -27,7 +27,8 @@ ribbon += adsorbate
 ribbon.center(axis=1, vacuum=3.5)
 
 txt = 'output_p_{}.txt'.format(size)
-ribbon.calc = GPAW(h=0.22,
+ribbon.calc = GPAW(mode='fd',
+                   h=0.22,
                    xc='PBE', 
                    txt=txt,
                    occupations=FermiDirac(0.2),
