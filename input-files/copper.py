@@ -8,7 +8,8 @@ from gpaw.mpi import size, rank
 from gpaw import GPAW, Mixer, ConvergenceError
 from gpaw.occupations import FermiDirac
 from gpaw.eigensolvers.rmmdiis import RMMDIIS
-from gpaw.test import equal
+import pytest
+#from gpaw.test import equal
 
 # no. of replicates in each dimension (increase to scale up the system)
 x = 2
@@ -50,7 +51,7 @@ args = {'mode' : 'fd',
         'txt': txt}
 
 calc = GPAW(**args)
-atoms.set_calculator(calc)
+atoms.calc = calc
 
 # execute the run
 try:
@@ -63,5 +64,5 @@ if rank == 0:
     print("Free energy: " + str(e0))
 
 # Check the result
-equal(e0, -226.93897028587003, 1e-4)
+assert e0 == pytest.approx(-226.93897028587003, abs=1e-4)
 
